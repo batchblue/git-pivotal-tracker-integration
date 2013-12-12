@@ -81,6 +81,60 @@ class GitPivotalTrackerIntegration::Command::Configuration
     GitPivotalTrackerIntegration::Util::Git.set_config KEY_STORY_ID, story.id, :branch
   end
 
+
+  # Returns the user's Github login.  If this login has not been
+  # configured, prompts the user for the value.  The value is checked for in
+  # the _inherited_ Git configuration, but is stored in the _global_ Git
+  # configuration so that it can be used across multiple repositories.
+  #
+  # @return [String] The user's Github login
+  def github_login
+    login = GitPivotalTrackerIntegration::Util::Git.get_config KEY_GITHUB_LOGIN, :inherited
+
+    if login.empty?
+      login = ask('Github login: ').strip
+      GitPivotalTrackerIntegration::Util::Git.set_config KEY_GITHUB_LOGIN, login, :global
+      puts
+    end
+
+    login
+  end
+
+  # Returns the user's Github password.  If this password has not been
+  # configured, prompts the user for the value.  The value is checked for in
+  # the _inherited_ Git configuration, but is stored in the _global_ Git
+  # configuration so that it can be used across multiple repositories.
+  #
+  # @return [String] The user's Github password
+  def github_password
+    password = GitPivotalTrackerIntegration::Util::Git.get_config KEY_GITHUB_PASSWORD, :inherited
+
+    if password.empty?
+      password = ask('Github password: ').strip
+      GitPivotalTrackerIntegration::Util::Git.set_config KEY_GITHUB_PASSWORD, password, :global
+      puts
+    end
+
+    password
+  end
+
+  # Returns the Github repository url for this project.  If this url
+  # has not been configured, prompts the user for the value.  The value is
+  # checked for in the _inherited_ Git configuration, but is stored in the
+  # _local_ Git configuration so that it is specific to this repository.
+  #
+  # @return [String] The projects Github repository url
+  def github_repo_url
+    url = GitPivotalTrackerIntegration::Util::Git.get_config KEY_GITHUB_REPO_URL, :inherited
+
+    if url.empty?
+      url = ask('Github repo url: ').strip
+      GitPivotalTrackerIntegration::Util::Git.set_config KEY_GITHUB_REPO_URL, url, :local
+      puts
+    end
+
+    url
+  end
   private
 
   KEY_API_TOKEN = 'pivotal.api-token'.freeze
@@ -89,4 +143,7 @@ class GitPivotalTrackerIntegration::Command::Configuration
 
   KEY_STORY_ID = 'pivotal-story-id'.freeze
 
+  KEY_GITHUB_PASSWORD = 'github.password'.freeze
+
+  KEY_GITHUB_REPO_URL = 'github.repo_url'.freeze
 end
